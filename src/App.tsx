@@ -1,5 +1,5 @@
 import { type ChangeEvent, type KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { FixedSizeList as List } from 'react-window';
+import { FixedSizeList as List, type ListChildComponentProps } from 'react-window';
 
 import { Trie } from './utils/tries-for-words';
 import './App.css';
@@ -33,7 +33,11 @@ function App() {
     let timeoutId: number;
     if (searchText != null) {
       timeoutId = setTimeout(() => {
-        setWords(() => trie.search(searchText || ''));
+        if(searchText) {
+          setWords(() => trie.search(searchText));
+        } else if(searchText == '') {
+          setWords(trie.words);
+        }
       }, 100);
     }
 
@@ -41,7 +45,7 @@ function App() {
   }, [searchText]);
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value.trim();
+    const text = e.target.value.trim().toLowerCase();
     if (text) setAutoSuggest(trie.suggest(text));
     else setAutoSuggest(null);
     setSearchText(text);
@@ -88,8 +92,9 @@ function App() {
   );
 }
 
-function Row(props: { index: number; style: React.CSSProperties; data: string[] }) {
-  const { data, index, style } = props;
+function Row(props: ListChildComponentProps<string[]>) {
+  const { data, index, style, isScrolling } = props;
+  if(isScrolling) return <div style={{...style, textAlign: 'center'}}>...</div>
   return <div style={style}>{data[index]}</div>;
 }
 

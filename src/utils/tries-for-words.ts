@@ -10,6 +10,7 @@ class TrieNode {
 
 export class Trie {
   root: TrieNode;
+  words: string[] = [];
 
   constructor() {
     this.root = new TrieNode();
@@ -29,6 +30,7 @@ export class Trie {
   getAllWords() {
     const words: string[] = [];
     this.dfs(this.root, [], words);
+    this.words = words;
     return words;
   }
 
