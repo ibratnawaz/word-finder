@@ -1,11 +1,12 @@
 import { type ChangeEvent, type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
-import debounce from 'lodash/debounce';
 
 import { Trie } from './utils/tries-for-words';
+import './App.css';
 
 function App() {
   const [words, setWords] = useState<string[] | null>([]);
+  const [searchText, setSearchText] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [autoSuggest, setAutoSuggest] = useState<string | null | undefined>(null);
   const { current: trie } = useRef(new Trie());
@@ -19,22 +20,29 @@ function App() {
       setWords(() => trie.getAllWords());
       setLoading(false);
     });
-
   }, []);
+
+  useEffect(() => {
+    let timeoutId: number;
+    if (searchText != null) {
+      timeoutId = setTimeout(() => {
+        setWords(() => trie.search(searchText || ''));
+      }, 100);
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [searchText]);
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value.trim();
-    e.target.value = text;
     if (text) setAutoSuggest(trie.suggest(text));
     else setAutoSuggest(null);
-    setWords(() => trie.search(text));
+    setSearchText(text);
   };
 
-  const debouncedOnChange = debounce(onChangeHandler, 100);
-
   const acceptSuggestion = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key == ' ' && words?.length && autoSuggest) {
-      e.currentTarget.value = autoSuggest;
+    if (e.key == 'ArrowRight' && words?.length && autoSuggest) {
+      setSearchText(autoSuggest);
     }
   };
 
@@ -43,15 +51,16 @@ function App() {
   }
 
   return (
-    <>
+    <div className='main-container'>
       <input
         type='text'
         placeholder='search any word...'
-        onChange={debouncedOnChange}
+        value={searchText || ''}
+        onChange={onChangeHandler}
         onKeyDown={acceptSuggestion}
       />
       {autoSuggest ? (
-        <p>May be you are searching this- {autoSuggest}. Press space to accept it.</p>
+        <p>May be you are searching this- {autoSuggest}. Press right arrow (➡️) to accept it.</p>
       ) : null}
 
       {!words ? (
@@ -63,11 +72,12 @@ function App() {
           itemCount={words?.length}
           itemSize={20}
           useIsScrolling
+          className='list'
           width={400}>
           {Row}
         </List>
       )}
-    </>
+    </div>
   );
 }
 
