@@ -10,6 +10,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [autoSuggest, setAutoSuggest] = useState<string | null | undefined>(null);
   const { current: trie } = useRef(new Trie());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const listRef = useRef<any>(null);
 
   useEffect(() => {
     fetch('./assets/words.json')
@@ -31,16 +33,14 @@ function App() {
 
   useEffect(() => {
     let timeout!: number;
-    if(timeout) clearTimeout(timeout);
+    if (timeout) clearTimeout(timeout);
 
     if (searchText != null) {
       timeout = setTimeout(() => {
-        console.log('called',searchText)
-        if(searchText) {
-          setWords(() => trie.search(searchText));
-        } else if(searchText == '') {
-          setWords(trie.words);
-        }
+        if (searchText) setWords(() => trie.search(searchText));
+        else if (searchText == '') setWords(trie.words);
+
+        listRef?.current?.scrollTo(0, 0);
       }, 300);
     }
 
@@ -81,6 +81,7 @@ function App() {
         <p>Oops!! Looks like no such word is born yet...</p>
       ) : (
         <List
+          ref={listRef}
           height={500}
           itemData={words}
           itemCount={words?.length}
@@ -97,8 +98,19 @@ function App() {
 
 function Row(props: ListChildComponentProps<string[]>) {
   const { data, index, style, isScrolling } = props;
-  if(isScrolling) return <div style={style} className='list-box loading'>...</div>
-  return <div style={style} className='list-box'>{data[index]}</div>;
+  if (isScrolling) {
+    return (
+      <div style={style} className='list-box loading'>
+        ...
+      </div>
+    );
+  }
+
+  return (
+    <div style={style} className='list-box'>
+      {data[index]}
+    </div>
+  );
 }
 
 export default App;
