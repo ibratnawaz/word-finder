@@ -12,4 +12,13 @@ body {
 
 .list {
     color: azure;
+    /* border: 0.1px solid #4240408f; */
+}
+
+.list-box {
+    border-bottom: 1px solid #2e2e2e;
+}
+
+.loading {
+    text-align: center;
 }

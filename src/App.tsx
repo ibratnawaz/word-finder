@@ -97,8 +97,8 @@ function App() {
 
 function Row(props: ListChildComponentProps<string[]>) {
   const { data, index, style, isScrolling } = props;
-  if(isScrolling) return <div style={{...style, textAlign: 'center'}}>...</div>
-  return <div style={style}>{data[index]}</div>;
+  if(isScrolling) return <div style={style} className='list-box loading'>...</div>
+  return <div style={style} className='list-box'>{data[index]}</div>;
 }
 
 export default App;
