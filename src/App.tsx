@@ -12,14 +12,21 @@ function App() {
   const { current: trie } = useRef(new Trie());
 
   useEffect(() => {
-    import('./utils/words.json').then((data) => {
-      for (const key in data) {
-        trie.insert(key);
-      }
+    fetch('./assets/words.json')
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        for (const key in data) {
+          trie.insert(key);
+        }
 
-      setWords(() => trie.getAllWords());
-      setLoading(false);
-    });
+        setWords(() => trie.getAllWords());
+        setLoading(false);
+      })
+      .catch((e: Error) => {
+        console.log(e.message);
+      });
   }, []);
 
   useEffect(() => {
