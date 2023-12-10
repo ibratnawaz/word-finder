@@ -30,18 +30,21 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let timeoutId: number;
+    let timeout!: number;
+    if(timeout) clearTimeout(timeout);
+
     if (searchText != null) {
-      timeoutId = setTimeout(() => {
+      timeout = setTimeout(() => {
+        console.log('called',searchText)
         if(searchText) {
           setWords(() => trie.search(searchText));
         } else if(searchText == '') {
           setWords(trie.words);
         }
-      }, 100);
+      }, 300);
     }
 
-    return () => clearTimeout(timeoutId);
+    return () => clearTimeout(timeout);
   }, [searchText]);
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
