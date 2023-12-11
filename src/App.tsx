@@ -14,37 +14,37 @@ function App() {
   const listRef = useRef<any>(null);
 
   useEffect(() => {
-    fetch('./assets/words.json')
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        for (const key in data) {
-          trie.insert(key);
-        }
+    window.requestIdleCallback(() => {
+      fetch('./assets/words.json')
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          for (const key in data) {
+            trie.insert(key);
+          }
 
-        setWords(() => trie.getAllWords());
-        setLoading(false);
-      })
-      .catch((e: Error) => {
-        console.log(e.message);
-      });
+          setWords(() => trie.getAllWords());
+          setLoading(false);
+        })
+        .catch((e: Error) => {
+          console.log(e.message);
+        });
+    });
   }, []);
 
   useEffect(() => {
     let timeout!: number;
-    window.requestIdleCallback(() => {
-      if (timeout) clearTimeout(timeout);
-  
-      if (searchText != null) {
-        timeout = setTimeout(() => {
-          if (searchText) setWords(() => trie.search(searchText));
-          else if (searchText == '') setWords(trie.words);
-  
-          listRef?.current?.scrollTo(0, 0);
-        }, 300);
-      }
-    });
+    if (timeout) clearTimeout(timeout);
+
+    if (searchText != null) {
+      timeout = setTimeout(() => {
+        if (searchText) setWords(() => trie.search(searchText));
+        else if (searchText == '') setWords(trie.words);
+
+        listRef?.current?.scrollTo(0, 0);
+      }, 300);
+    }
 
     return () => clearTimeout(timeout);
   }, [searchText]);
