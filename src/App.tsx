@@ -2,6 +2,7 @@ import { type ChangeEvent, type KeyboardEvent, useEffect, useRef, useState } fro
 import { FixedSizeList as List, type ListChildComponentProps } from 'react-window';
 
 import { Trie } from './utils/tries-for-words';
+import Worker2 from './utils/worker?worker';
 import './App.css';
 
 function App() {
@@ -14,23 +15,21 @@ function App() {
   const listRef = useRef<any>(null);
 
   useEffect(() => {
-    window.requestIdleCallback(() => {
-      fetch('./assets/words.json')
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          for (const key in data) {
-            trie.insert(key);
-          }
+    const worker = new Worker2() 
+    // another way -> const worker = new Worker((new URL('./utils/worker.ts', import.meta.url)));
 
-          setWords(() => trie.getAllWords());
-          setLoading(false);
-        })
-        .catch((e: Error) => {
-          console.log(e.message);
-        });
-    });
+    window.requestIdleCallback(() => {
+      worker.onmessage = (event) => {
+        for (const key in event.data) {
+          trie.insert(key);
+        }
+        setWords(() => trie.getAllWords());
+        setLoading(false);
+      };
+      worker.onerror = (error) => console.error('Web worker error:', error);
+    })
+
+    return () => worker.terminate();
   }, []);
 
   useEffect(() => {
