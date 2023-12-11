@@ -33,16 +33,18 @@ function App() {
 
   useEffect(() => {
     let timeout!: number;
-    if (timeout) clearTimeout(timeout);
-
-    if (searchText != null) {
-      timeout = setTimeout(() => {
-        if (searchText) setWords(() => trie.search(searchText));
-        else if (searchText == '') setWords(trie.words);
-
-        listRef?.current?.scrollTo(0, 0);
-      }, 300);
-    }
+    window.requestIdleCallback(() => {
+      if (timeout) clearTimeout(timeout);
+  
+      if (searchText != null) {
+        timeout = setTimeout(() => {
+          if (searchText) setWords(() => trie.search(searchText));
+          else if (searchText == '') setWords(trie.words);
+  
+          listRef?.current?.scrollTo(0, 0);
+        }, 300);
+      }
+    });
 
     return () => clearTimeout(timeout);
   }, [searchText]);

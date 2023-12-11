@@ -12,13 +12,37 @@ body {
 
 .list {
     color: azure;
-    /* border: 0.1px solid #4240408f; */
+    border: 0.1px solid red;
 }
 
 .list-box {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
     border-bottom: 1px solid #2e2e2e;
+    box-sizing: border-box;
 }
 
 .loading {
     text-align: center;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #000;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #cd9579;
 }
